@@ -43,7 +43,9 @@
 }
 
 - (void)setBadgesCount:(int)count {
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:count];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:count];
+    });
 }
 
 - (void)sendLocalNotification:(NSDictionary *)notification withId:(NSString *)notificationId {
@@ -65,6 +67,11 @@
 - (void)checkPermissions:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
     [_notificationCenter checkPermissions:resolve];
 }
+
+- (void)requestPermissions:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+    [_notificationCenter requestPermissions:resolve reject:reject];
+}
+
 
 - (void)removeAllDeliveredNotifications {
     [_notificationCenter removeAllDeliveredNotifications];

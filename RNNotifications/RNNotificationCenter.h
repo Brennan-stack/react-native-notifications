@@ -6,6 +6,8 @@ typedef void (^RCTPromiseRejectBlock)(NSString *code, NSString *message, NSError
 
 @import UserNotifications;
 
+static NSString *const kErrorUnableToRequestPermissions = @"E_UNABLE_TO_REQUEST_PERMISSIONS";
+
 @interface RNNotificationCenter : NSObject
 
 - (void)isRegisteredForRemoteNotifications:(RCTPromiseResolveBlock)resolve;
@@ -13,6 +15,9 @@ typedef void (^RCTPromiseRejectBlock)(NSString *code, NSString *message, NSError
 - (void)requestPermissionsWithCategories:(NSArray *)json;
 
 - (void)checkPermissions:(RCTPromiseResolveBlock)resolve;
+
+- (void)requestPermissions:(RCTPromiseResolveBlock)resolve
+                    reject:(RCTPromiseRejectBlock)reject;
 
 - (void)sendLocalNotification:(NSDictionary *)notification withId:(NSString *)notificationId;
 

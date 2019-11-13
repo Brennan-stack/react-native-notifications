@@ -33,6 +33,9 @@
 - (void)checkPermissions:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject;
 
+- (void)requestPermissions:(RCTPromiseResolveBlock)resolve
+                    reject:(RCTPromiseRejectBlock)reject;
+
 - (void)removeAllDeliveredNotifications;
 
 - (void)removeDeliveredNotifications:(NSArray<NSString *> *)identifiers;

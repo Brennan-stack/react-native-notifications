@@ -76,10 +76,39 @@
 - (void)checkPermissions:(RCTPromiseResolveBlock)resolve {
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
         resolve(@{
-                  @"badge": @(settings.badgeSetting == UNNotificationSettingEnabled),
-                  @"sound": @(settings.soundSetting == UNNotificationSettingEnabled),
-                  @"alert": @(settings.alertSetting == UNNotificationSettingEnabled),
-                  });
+            @"badge": @(settings.badgeSetting == UNNotificationSettingEnabled),
+            @"sound": @(settings.soundSetting == UNNotificationSettingEnabled),
+            @"alert": @(settings.alertSetting == UNNotificationSettingEnabled),
+        });
+    }];
+}
+
+- (void)requestPermissions:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+    UNAuthorizationOptions authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+    [UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:authOptions completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!error && granted) {
+            [UNUserNotificationCenter.currentNotificationCenter getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[UIApplication sharedApplication] registerForRemoteNotifications];
+                    });
+                }
+                NSDictionary *notificationTypes = @{
+                    @"badge": @(settings.badgeSetting == UNNotificationSettingEnabled),
+                    @"sound": @(settings.soundSetting == UNNotificationSettingEnabled),
+                    @"alert": @(settings.alertSetting == UNNotificationSettingEnabled),
+                };
+                resolve(notificationTypes);
+            }];
+        } else if (!error) {
+            resolve( @{
+                @"badge": @false,
+                @"sound": @false,
+                @"alert": @false,
+            });
+        } else {
+            reject(kErrorUnableToRequestPermissions, nil, RCTErrorWithMessage(@"Requesting push notifications is currently unavailable"));
+        }
     }];
 }
 

@@ -85,6 +85,12 @@ RCT_EXPORT_METHOD(checkPermissions:(RCTPromiseResolveBlock)resolve
     [_commandsHandler checkPermissions:resolve reject:reject];
 }
 
+#pragma mark - JS interface - Hurdlr methods
+RCT_EXPORT_METHOD(requestPermissions:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    [_commandsHandler requestPermissions:resolve reject:reject];
+}
+
 #if !TARGET_OS_TV
 
 RCT_EXPORT_METHOD(removeAllDeliveredNotifications) {
