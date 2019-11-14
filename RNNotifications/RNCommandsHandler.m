@@ -18,7 +18,7 @@
 }
 
 - (void)getInitialNotification:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
-    resolve([[RNNotificationsStore sharedInstance] initialNotification]);
+    resolve([RNNotificationsStore getInitialNotification]);
 }
 
 - (void)finishHandlingAction:(NSString *)completionKey {

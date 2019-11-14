@@ -3,6 +3,7 @@
 #import "RNNotificationUtils.h"
 #import "RCTConvert+RNNotifications.h"
 #import "RNNotificationParser.h"
+#import "RNNotificationCenter.h"
 
 @implementation RNNotificationEventHandler {
     RNNotificationsStore* _store;
@@ -30,7 +31,11 @@
 
 - (void)didReceiveNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(void))completionHandler {
     [_store setActionCompletionHandler:completionHandler withCompletionKey:response.notification.request.identifier];
-    [RNEventEmitter sendEvent:RNNotificationOpened body:[RNNotificationParser parseNotificationResponse:response]];
+    if ([RNNotificationCenter isJsReady]) {
+        [RNEventEmitter sendEvent:RNNotificationOpened body:[RNNotificationParser parseNotificationResponse:response]];
+    } else {
+        [RNNotificationsStore setInitialNotification:[RNNotificationParser parseNotificationResponse:response]];
+    }
 }
 
 @end

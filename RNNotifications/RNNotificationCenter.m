@@ -1,7 +1,17 @@
 #import "RNNotificationCenter.h"
 #import "RCTConvert+RNNotifications.h"
 
+static bool _isJsReady = FALSE;
+
 @implementation RNNotificationCenter
+
++ (bool)isJsReady {
+    return _isJsReady;
+}
+
++ (void)setJsReady {
+    _isJsReady = TRUE;
+}
 
 - (void)requestPermissionsWithCategories:(NSArray *)json {
     NSMutableSet<UNNotificationCategory *>* categories = nil;

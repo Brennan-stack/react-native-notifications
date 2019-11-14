@@ -2,6 +2,7 @@
 #import "RNCommandsHandler.h"
 #import "RCTConvert+RNNotifications.h"
 #import "RNNotificationsStore.h"
+#import "RNNotificationCenter.h"
 #import <React/RCTBridgeDelegate.h>
 #import <React/RCTBridge.h>
 
@@ -26,7 +27,7 @@ RCT_EXPORT_MODULE();
 - (void)setBridge:(RCTBridge *)bridge {
     _bridge = bridge;
     if ([_bridge.launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
-        [[RNNotificationsStore sharedInstance] setInitialNotification:[_bridge.launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
+        [RNNotificationsStore setInitialNotification:[_bridge.launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
     }
 }
 
@@ -89,6 +90,10 @@ RCT_EXPORT_METHOD(checkPermissions:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(requestPermissions:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     [_commandsHandler requestPermissions:resolve reject:reject];
+}
+
+RCT_EXPORT_METHOD(jsInitialised) {
+    [RNNotificationCenter setJsReady];
 }
 
 #if !TARGET_OS_TV

@@ -10,6 +10,10 @@ static NSString *const kErrorUnableToRequestPermissions = @"E_UNABLE_TO_REQUEST_
 
 @interface RNNotificationCenter : NSObject
 
++ (bool)isJsReady;
+
++ (void)setJsReady;
+
 - (void)isRegisteredForRemoteNotifications:(RCTPromiseResolveBlock)resolve;
 
 - (void)requestPermissionsWithCategories:(NSArray *)json;

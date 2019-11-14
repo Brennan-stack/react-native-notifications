@@ -57,7 +57,7 @@
 
 - (void)testGetInitialNotification {
     NSDictionary* initialNotification = @{};
-    [[RNNotificationsStore sharedInstance] setInitialNotification:initialNotification];
+    [RNNotificationsStore setInitialNotification:initialNotification];
     
     [self.uut getInitialNotification:^(id result) {
         XCTAssertEqual(result, initialNotification);

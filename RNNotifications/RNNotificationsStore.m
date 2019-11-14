@@ -1,5 +1,7 @@
 #import "RNNotificationsStore.h"
 
+static NSDictionary* _initialNotification;
+
 @implementation RNNotificationsStore
 NSMutableDictionary* _actionCompletionHandlers;
 NSMutableDictionary* _presentationCompletionHandlers;
@@ -19,6 +21,14 @@ NSMutableDictionary* _presentationCompletionHandlers;
     _actionCompletionHandlers = [NSMutableDictionary new];
     _presentationCompletionHandlers = [NSMutableDictionary new];
     return self;
+}
+
++ (NSDictionary *)getInitialNotification {
+    return _initialNotification;
+}
+
++ (void)setInitialNotification:(NSDictionary *)initialNotification {
+    _initialNotification = initialNotification;
 }
 
 - (void)setActionCompletionHandler:(void (^)(void))completionHandler withCompletionKey:(NSString *)completionKey {
