@@ -1,9 +1,11 @@
 package com.wix.reactnativenotifications;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -24,6 +26,8 @@ import com.wix.reactnativenotifications.core.notification.PushNotificationProps;
 import com.wix.reactnativenotifications.core.notificationdrawer.IPushNotificationsDrawer;
 import com.wix.reactnativenotifications.core.notificationdrawer.PushNotificationsDrawer;
 import com.wix.reactnativenotifications.fcm.FcmInstanceIdRefreshHandlerService;
+
+import java.util.List;
 
 import static com.wix.reactnativenotifications.Defs.LOGTAG;
 
