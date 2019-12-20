@@ -8,6 +8,7 @@ public class InitialNotificationHolder {
     private static InitialNotificationHolder sInstance;
 
     private PushNotificationProps mNotification;
+    private String mAction;
 
     public static void setInstance(InitialNotificationHolder instance) {
         sInstance = instance;
@@ -27,11 +28,20 @@ public class InitialNotificationHolder {
         mNotification = pushNotificationProps;
     }
 
-    public void clear() {
-        mNotification = null;
-    }
-
     public PushNotificationProps get() {
         return mNotification;
+    }
+
+    public void setAction(String action) {
+        mAction = action;
+    }
+
+    public String getAction() {
+        return mAction;
+    }
+
+    public void clear() {
+        mNotification = null;
+        mAction = null;
     }
 }

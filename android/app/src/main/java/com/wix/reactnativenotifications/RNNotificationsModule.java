@@ -99,11 +99,15 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
 
         try {
             final PushNotificationProps notification = InitialNotificationHolder.getInstance().get();
+            final String action = InitialNotificationHolder.getInstance().getAction();
             if (notification == null) {
                 return;
             }
 
-            result = Arguments.fromBundle(notification.asBundle());
+            Bundle notificationBundle = notification.asBundle();
+            notificationBundle.putString("action", action);
+
+            result = Arguments.fromBundle(notificationBundle);
         } finally {
             promise.resolve(result);
         }
