@@ -8,8 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
-import android.util.Log;
+import android.service.notification.StatusBarNotification;
 
 import com.facebook.react.bridge.ReactContext;
 import com.wix.reactnativenotifications.core.AppLaunchHelper;
@@ -92,7 +91,13 @@ public class PushNotification implements IPushNotification {
     protected int postNotification(Integer notificationId) {
         final PendingIntent pendingIntent = getCTAPendingIntent();
         final Notification notification = buildNotification(pendingIntent);
-        return postNotification(notification, notificationId);
+        final int id = postNotification(notification, notificationId);
+        // Only Android N (v24) and above supports collapsible grouping
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && shouldPostSummaryNotification(notification)) {
+            final Notification summaryNotification = buildSummaryNotification(notification);
+            postNotification(summaryNotification, getSummaryNotificationId(summaryNotification.getGroup()));
+        }
+        return id;
     }
 
     protected void digestNotification() {
@@ -160,12 +165,12 @@ public class PushNotification implements IPushNotification {
                 .setAutoCancel(true);
 
 
-             int resourceID = mContext.getResources().getIdentifier("notification_icon", "drawable", mContext.getPackageName());
-                if (resourceID != 0) {
-                    notification.setSmallIcon(resourceID);
-                } else {
-                    notification.setSmallIcon(mContext.getApplicationInfo().icon);
-                }
+        int resourceID = mContext.getResources().getIdentifier("notification_icon", "drawable", mContext.getPackageName());
+        if (resourceID != 0) {
+            notification.setSmallIcon(resourceID);
+        } else {
+            notification.setSmallIcon(mContext.getApplicationInfo().icon);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
@@ -190,13 +195,41 @@ public class PushNotification implements IPushNotification {
         notificationManager.notify(id, notification);
     }
 
+    protected boolean shouldPostSummaryNotification(Notification newNotification) {
+        boolean shouldPostSummaryNotification = false;
+        final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newNotification.getGroup() != null) {
+            StatusBarNotification[] statusBarNotifications = notificationManager.getActiveNotifications();
+            Integer totalNotificationForGroup = 0;
+            for (StatusBarNotification statusBarNotification : statusBarNotifications) {
+                String groupName = statusBarNotification.getNotification().getGroup();
+                if (newNotification.getGroup().equals(groupName)) {
+                    totalNotificationForGroup++;
+                }
+                if (totalNotificationForGroup >= 4) { // The default number of notification before grouping is 4
+                    shouldPostSummaryNotification = true;
+                    break;
+                }
+            }
+        }
+        return shouldPostSummaryNotification;
+    }
+
+    protected Notification buildSummaryNotification(Notification existingNotification) {
+        return getSummaryNotificationBuilder(existingNotification).build();
+    }
+
+    protected int getSummaryNotificationId(String group) {
+        return createNotificationId(null);
+    }
+
+    protected Notification.Builder getSummaryNotificationBuilder(Notification existingNotification) {
+        return new Notification.Builder(mContext);
+    }
+
     protected void clearAllNotifications() {
         final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        try {
-            notificationManager.cancelAll();
-        } catch (Exception e) {
-            // NotificationManager.cancellAll() can throw a SecurityException
-        }
+        notificationManager.cancelAll();
     }
 
     protected int createNotificationId(Notification notification) {
