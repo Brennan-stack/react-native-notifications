@@ -22,7 +22,9 @@
 }
 
 - (void)finishHandlingAction:(NSString *)completionKey {
-    [[RNNotificationsStore sharedInstance] completeAction:completionKey];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[RNNotificationsStore sharedInstance] completeAction:completionKey];
+    }
 }
 
 - (void)finishPresentingNotification:(NSString *)completionKey presentingOptions:(NSDictionary *)presentingOptions {
