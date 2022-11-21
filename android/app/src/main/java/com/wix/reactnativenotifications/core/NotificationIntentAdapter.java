@@ -12,6 +12,8 @@ public class NotificationIntentAdapter {
 
     public static PendingIntent createPendingNotificationIntent(Context appContext, Intent intent, PushNotificationProps notification) {
         intent.putExtra(PUSH_NOTIFICATION_EXTRA_NAME, notification.asBundle());
+        //See https://github.com/wix/react-native-notifications/pull/812/files#diff-5e19e64ecc4213c362f384ece58cee190789b8703512d33b226fcec30e920f01R22 
+        //as source of PendingIntent.FLAG_IMMUTABLE
         return PendingIntent.getService(appContext, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
     }
 
