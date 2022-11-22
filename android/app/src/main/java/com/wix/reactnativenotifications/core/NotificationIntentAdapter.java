@@ -5,11 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.TaskStackBuilder;
-import android.util.Log;
-import com.wix.reactnativenotifications.RNNotificationsModule;
-import com.wix.reactnativenotifications.RNNotificationsPackage;
 import com.wix.reactnativenotifications.core.notification.PushNotificationProps;
-import static com.wix.reactnativenotifications.Defs.LOGTAG;
 
 public class NotificationIntentAdapter {
     private static final String PUSH_NOTIFICATION_EXTRA_NAME = "pushNotification";
