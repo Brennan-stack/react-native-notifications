@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import com.facebook.react.bridge.ReactContext;
 import com.wix.reactnativenotifications.core.AppLaunchHelper;
@@ -23,6 +24,8 @@ import com.wix.reactnativenotifications.core.ProxyService;
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_OPENED_EVENT_NAME;
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_EVENT_NAME;
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_FOREGROUND_EVENT_NAME;
+import static com.wix.reactnativenotifications.Defs.LOGTAG;
+
 
 public class PushNotification implements IPushNotification {
 
@@ -89,7 +92,7 @@ public class PushNotification implements IPushNotification {
     }
 
     protected int postNotification(Integer notificationId) {
-        final PendingIntent pendingIntent = getCTAPendingIntent();
+        final PendingIntent pendingIntent = NotificationIntentAdapter.createPendingNotificationIntent(mContext, mNotificationProps);
         final Notification notification = buildNotification(pendingIntent);
         final int id = postNotification(notification, notificationId);
         // Only Android N (v24) and above supports collapsible grouping
@@ -105,11 +108,15 @@ public class PushNotification implements IPushNotification {
             setAsInitialNotification();
             launchOrResumeApp();
             return;
-        }
+        } 
 
-        final ReactContext reactContext = mAppLifecycleFacade.getRunningReactContext();
-        if (reactContext.getCurrentActivity() == null) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             setAsInitialNotification();
+        } else {
+            final ReactContext reactContext = mAppLifecycleFacade.getRunningReactContext();
+            if (reactContext.getCurrentActivity() == null) {
+                setAsInitialNotification();
+            }
         }
 
         if (mAppLifecycleFacade.isAppVisible()) {
@@ -141,11 +148,6 @@ public class PushNotification implements IPushNotification {
 
     protected AppVisibilityListener getIntermediateAppVisibilityListener() {
         return mAppVisibilityListener;
-    }
-
-    protected PendingIntent getCTAPendingIntent() {
-        final Intent cta = new Intent(mContext, ProxyService.class);
-        return NotificationIntentAdapter.createPendingNotificationIntent(mContext, cta, mNotificationProps);
     }
 
     protected Notification buildNotification(PendingIntent intent) {
@@ -249,7 +251,9 @@ public class PushNotification implements IPushNotification {
     }
 
     protected void launchOrResumeApp() {
-        final Intent intent = mAppLaunchHelper.getLaunchIntent(mContext);
-        mContext.startActivity(intent);
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+            final Intent intent = mAppLaunchHelper.getLaunchIntent(mContext);
+            mContext.startActivity(intent);
+        }
     }
 }

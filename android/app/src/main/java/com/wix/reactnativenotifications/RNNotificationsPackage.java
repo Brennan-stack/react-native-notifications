@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.content.Context;
+
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.ActivityEventListener;
@@ -14,6 +16,7 @@ import com.facebook.react.uimanager.ViewManager;
 import com.google.firebase.FirebaseApp;
 import com.wix.reactnativenotifications.core.AppLifecycleFacade;
 import com.wix.reactnativenotifications.core.AppLifecycleFacadeHolder;
+import com.wix.reactnativenotifications.core.InitialNotificationHolder;
 import com.wix.reactnativenotifications.core.NotificationIntentAdapter;
 import com.wix.reactnativenotifications.core.notification.IPushNotification;
 import com.wix.reactnativenotifications.core.notification.PushNotification;
@@ -63,11 +66,24 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         final IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(mApplication.getApplicationContext());
         notificationsDrawer.onNewActivity(activity);
+        callOnOpenedIfNeed(activity);
+        // Intent intent = activity.getIntent();
+        // if (NotificationIntentAdapter.canHandleIntent(intent)) {
+        //     Bundle notificationData = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S ? 
+        //         NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent) : intent.getExtras();
+        //     final IPushNotification pushNotification = PushNotification.get(mApplication.getApplicationContext(), notificationData);
+        //     if (pushNotification != null) {
+        //         pushNotification.onOpened();
+        //     }
+        // }
+    }
 
+    private void callOnOpenedIfNeed(Activity activity) {
         Intent intent = activity.getIntent();
         if (NotificationIntentAdapter.canHandleIntent(intent)) {
+            Context appContext = mApplication.getApplicationContext();
             Bundle notificationData = intent.getExtras();
-            final IPushNotification pushNotification = PushNotification.get(mApplication.getApplicationContext(), notificationData);
+            final IPushNotification pushNotification = PushNotification.get(appContext, notificationData);
             if (pushNotification != null) {
                 pushNotification.onOpened();
             }
@@ -76,6 +92,9 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
 
     @Override
     public void onActivityStarted(Activity activity) {
+        if (InitialNotificationHolder.getInstance().get() == null) {
+            callOnOpenedIfNeed(activity);
+        }
     }
 
     @Override
